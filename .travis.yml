@@ -25,7 +25,7 @@ install:
 
 # 3. Build test applications
 script:
-    - for d in $TRAVIS_BUILD_DIR/app/*/ ; do echo -e "\n#### $d ####\n" ; cd "$d" ; make ; done
+    - for d in $TRAVIS_BUILD_DIR/app/*/ ; do echo -e "\n---- $d ----\n" ; cd "$d" ; make ; done
 
 jobs:
     include:
