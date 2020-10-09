@@ -1,0 +1,15 @@
+os: linux
+dist:
+  - bionic # 18.04
+  - focal  # 20.04
+
+language: c
+arch: amd64
+
+notifications:
+  email: false
+
+script:
+  - cd kernel/
+  - ./install_SGX_driver.sh              # tested on Ubuntu 18.04/20.04
+  - make clean load
