@@ -7,15 +7,21 @@ notifications:
 
 before_install:
     - sudo apt-get update
-    - cd kernel/
+    - cd $TRAVIS_BUILD_DIR/kernel/
     - bash -x ./install_SGX_driver.sh
     - make clean load
 
 install:
-    - cd ../sdk/intel-sdk/
+    - cd $TRAVIS_BUILD_DIR/sdk/intel-sdk/
     - bash -x ./install_SGX_SDK.sh
     - source /opt/intel/sgxsdk/environment
     - sudo service aesmd status
+
+script:
+    - cd $TRAVIS_BUILD_DIR/app/cpl
+    - make run
+    - cd ../app/idt
+    - make run
 
 jobs:
     include:
