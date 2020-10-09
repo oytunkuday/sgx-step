@@ -11,7 +11,7 @@ before_install:
     - make clean load
 
 install:
-    - cd sdk/intel-sdk/
+    - cd ../sdk/intel-sdk/
     - ./install_SGX_SDK.sh
     - source /opt/intel/sgxsdk/environment
     - sudo service aesmd status
