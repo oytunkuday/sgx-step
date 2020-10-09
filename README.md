@@ -103,7 +103,7 @@ This repository is organized as follows:
 └── sdk        -- Bindings to use SGX-Step with different SGX SDKs and libOSs.
 ```
 
-## Building and running
+## Building and running [![Build Status](https://travis-ci.org/jovanbulck/sgx-step.svg?branc
 
 ### 0. System requirements
 

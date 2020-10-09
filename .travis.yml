@@ -6,13 +6,14 @@ notifications:
   email: false
 
 before_install:
+    - sudo apt-get update
     - cd kernel/
-    - ./install_SGX_driver.sh
+    - bash -x ./install_SGX_driver.sh
     - make clean load
 
 install:
     - cd ../sdk/intel-sdk/
-    - ./install_SGX_SDK.sh
+    - bash -x ./install_SGX_SDK.sh
     - source /opt/intel/sgxsdk/environment
     - sudo service aesmd status
 
