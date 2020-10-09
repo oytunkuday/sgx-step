@@ -18,7 +18,7 @@ install:
     - bash -x ./install_SGX_SDK.sh
     - source /opt/intel/sgxsdk/environment
     - sudo service aesmd status
-    - cd SampleCode/LocalAttestation
+    - cd linux-sgx/SampleCode/LocalAttestation
     - make SGX_MODE=SIM
     - cd bin
     - ./app
