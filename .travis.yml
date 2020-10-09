@@ -5,23 +5,30 @@ arch: amd64
 notifications:
   email: false
 
+# 1. Build and load `/dev/sgx-step`
 before_install:
     - sudo apt-get update
     - cd $TRAVIS_BUILD_DIR/kernel/
     - bash -x ./install_SGX_driver.sh
     - make clean load
 
+# 2. Patch and install SGX SDK
 install:
     - cd $TRAVIS_BUILD_DIR/sdk/intel-sdk/
     - bash -x ./install_SGX_SDK.sh
     - source /opt/intel/sgxsdk/environment
     - sudo service aesmd status
+    - cd SampleCode/LocalAttestation
+    - make SGX_MODE=SIM
+    - cd bin
+    - ./app
 
+# 3. Build test applications
 script:
-    - cd $TRAVIS_BUILD_DIR/app/cpl
-    - make run
-    - cd ../app/idt
-    - make run
+    - for d in $TRAVIS_BUILD_DIR/app/*/ ; do \
+        cd "$d"                              \
+        make                                 \
+      done
 
 jobs:
     include:
