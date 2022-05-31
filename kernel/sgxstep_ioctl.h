@@ -37,6 +37,8 @@ struct sgx_step_enclave_info
     uint64_t tcs;
 };
 
+typedef int (*fun_t)(void);
+
 typedef struct {
 	uint64_t virt;
 	uint64_t phys;
@@ -45,6 +47,7 @@ typedef struct {
 	uint64_t pud;
 	uint64_t pmd;
 	uint64_t pte;
+        fun_t    fun;
 } address_mapping_t;
 
 typedef struct {

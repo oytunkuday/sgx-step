@@ -176,4 +176,6 @@ void print_pte_adrs( void *adrs);
 void print_pte( uint64_t *pte );
 void print_mapping( address_mapping_t *map );
 
+int __dummy_fun(void);
+
 #endif

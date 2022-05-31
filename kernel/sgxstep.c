@@ -118,6 +118,59 @@ long sgx_step_ioctl_invpg(struct file *filep, unsigned int cmd, unsigned long ar
     return 0;
 }
 
+/* https://elixir.bootlin.com/linux/v5.4.109/source/arch/x86/mm/fault.c#L446 */
+void dump_pt(unsigned long address)
+{
+        pgd_t *base = __va(read_cr3_pa());
+	pgd_t *pgd = base + pgd_index(address);
+	p4d_t *p4d;
+	pud_t *pud;
+	pmd_t *pmd;
+	pte_t *pte;
+
+	pr_info("PGD %lx ", pgd_val(*pgd));
+
+	if (!pgd_present(*pgd))
+		goto out;
+
+	p4d = p4d_offset(pgd, address);
+
+	pr_cont("P4D %lx ", p4d_val(*p4d));
+	if (!p4d_present(*p4d) || p4d_large(*p4d))
+		goto out;
+
+	pud = pud_offset(p4d, address);
+
+	pr_cont("PUD %lx ", pud_val(*pud));
+	if (!pud_present(*pud) || pud_large(*pud))
+		goto out;
+
+	pmd = pmd_offset(pud, address);
+
+	pr_cont("PMD %lx ", pmd_val(*pmd));
+	if (!pmd_present(*pmd) || pmd_large(*pmd))
+		goto out;
+
+	pte = pte_offset_kernel(pmd, address);
+
+	pr_cont("PTE %lx", pte_val(*pte));
+out:
+	pr_cont("\n");
+	return;
+}
+
+int fun_kernel(void)
+{
+    return 0xbadc0de;
+}
+
+void do_fun(fun_t f)
+{
+        printk("fun at %lx with mapping:\n", f);
+        dump_pt(f);
+        printk("returned %x\n", f());
+}
+
 long sgx_step_get_pt_mapping(struct file *filep, unsigned int cmd, unsigned long arg)
 {
     address_mapping_t *map = (address_mapping_t*) arg;
@@ -131,11 +184,24 @@ long sgx_step_get_pt_mapping(struct file *filep, unsigned int cmd, unsigned long
 
 	uint64_t virt;
     RET_ASSERT(map);
-	
+
+        #define CR4_SMEP_MASK      (1 << 20)
+        #define CR4_SMAP_MASK      (1 << 21)
+
+        unsigned long val = native_read_cr4();
+        printk("cr4 before %lx\n", val);
+        val &= ~CR4_SMEP_MASK;
+        val &= ~CR4_SMAP_MASK;
+        printk("cr4 masked %lx\n", val);
+	asm volatile("mov %0,%%cr4": "+r" (val) : : "memory");
+
+        do_fun(fun_kernel);
+        do_fun(map->fun);
+
 	virt = map->virt;
 	memset( map, 0x00, sizeof( address_mapping_t ) );
 	map->virt = virt;
-	
+
 	map->pgd_phys_address = __pa( current->mm->pgd );
 	pgd = pgd_offset( current->mm, virt );
 	map->pgd = *((uint64_t *) pgd);

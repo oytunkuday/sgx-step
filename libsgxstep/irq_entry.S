@@ -47,6 +47,11 @@ __ss_irq_handler:
     mov __ss_irq_rdx(%rip), %rdx
     iretq
 
+    .global __dummy_fun
+__dummy_fun:
+    mov $0xc0de, %rax
+    ret
+
 /* ********************************************************************** */
     .global sgx_step_irq_gate_func
 sgx_step_irq_gate_func:

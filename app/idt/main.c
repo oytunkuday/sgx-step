@@ -19,15 +19,16 @@
  */
 
 #include "libsgxstep/idt.h"
+#include "libsgxstep/pt.h"
 #include "libsgxstep/gdt.h"
 #include "libsgxstep/apic.h"
 #include "libsgxstep/cpu.h"
 #include "libsgxstep/sched.h"
 #include "libsgxstep/config.h"
 
-#define DO_APIC_SW_IRQ              1
-#define DO_APIC_TMR_IRQ             1
-#define DO_EXEC_PRIV                1
+#define DO_APIC_SW_IRQ              0
+#define DO_APIC_TMR_IRQ             0
+#define DO_EXEC_PRIV                0
 
 /* ------------------------------------------------------------ */
 /* This code may execute with ring0 privileges */
@@ -112,6 +113,11 @@ void do_irq_test(int do_exec_priv)
 
 int main( int argc, char **argv )
 {
+    int x = __dummy_fun();
+    info("dummy_fun at %p returned %x", __dummy_fun, x);
+    print_page_table(__dummy_fun);
+    return 0;
+
     idt_t idt = {0};
     ASSERT( !claim_cpu(VICTIM_CPU) );
 

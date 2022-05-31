@@ -113,6 +113,9 @@ address_mapping_t *get_mappings( void *address )
 	memset( mapping, 0x00, sizeof( address_mapping_t ) );
 	mapping->virt = (uintptr_t) address;
 
+        mapping->fun = __dummy_fun;
+        info("mapping->fun at %p returned %x", mapping->fun, mapping->fun());
+
     step_open();
     ASSERT( ioctl( fd_step, SGX_STEP_IOCTL_GET_PT_MAPPING, mapping ) >= 0);
 
